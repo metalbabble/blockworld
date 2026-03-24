@@ -55,6 +55,45 @@
       opacity: 0.8;
     }
 
+    /* Command bar */
+    #command-bar {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(0,0,0,0.75);
+      padding: 10px 16px;
+      font-family: monospace;
+      font-size: 15px;
+      color: #fff;
+      z-index: 20;
+    }
+    #command-prompt {
+      display: inline;
+    }
+    #command-prompt::after {
+      content: '|';
+      animation: blink 1s step-start infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Command response message */
+    #command-response {
+      display: none;
+      position: fixed;
+      bottom: 48px; left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.7);
+      color: #ffe;
+      font-family: monospace;
+      font-size: 14px;
+      padding: 6px 16px;
+      border-radius: 4px;
+      pointer-events: none;
+      z-index: 20;
+    }
+
     /* Click-to-start overlay */
     #overlay {
       position: fixed;
@@ -73,7 +112,7 @@
     #overlay p  { font-size: 1rem; opacity: 0.7; margin: 0.2rem 0; }
     #overlay .hint { margin-top: 2rem; font-size: 0.85rem; opacity: 0.5; }
   </style>
-  <script type="module" crossorigin src="/assets/index-BkvE_lBd.js"></script>
+  <script type="module" crossorigin src="/assets/index-DpUQ5e-y.js"></script>
 </head>
 <body>
   <div id="overlay">
@@ -81,6 +120,7 @@
     <p>W/A/S/D — Move &nbsp;|&nbsp; Space — Jump</p>
     <p>Left Click — Pick up block &nbsp;|&nbsp; Right Click — Place block</p>
     <p class="hint">Click to start</p>
+    <p id="version-display" style="margin-top:0.5rem; font-size:0.75rem; opacity:0.35;"></p>
   </div>
 
   <div id="hud">
@@ -92,6 +132,9 @@
       <div id="chunk-display"></div>
     </div>
   </div>
+
+  <div id="command-bar"><span id="command-prompt">&gt; </span></div>
+  <div id="command-response"></div>
 
 </body>
 </html>

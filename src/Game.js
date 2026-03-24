@@ -73,6 +73,7 @@ export class Game {
     this.material = new THREE.MeshLambertMaterial({ map: atlas, side: THREE.FrontSide, vertexColors: true });
     this.world = new World(this.scene, this.material);
     document.getElementById('world-seed').textContent = `World #${WORLD_SEED}`;
+    document.getElementById('version-display').textContent = `v${config.version}`;
   }
 
   _initPlayer() {
