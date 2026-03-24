@@ -2,6 +2,12 @@
 
 A browser-based first-person voxel sandbox built with [Three.js](https://threejs.org/) and [Vite](https://vitejs.dev/). Dig up blocks and place them back down in an infinitely generating world.
 
+![Screenshot 1](/misc/1.png)
+![Screenshot 2](/misc/2.png)
+![Screenshot 3](/misc/3.png)
+![Screenshot 4](/misc/4.png)
+![Screenshot 5](/misc/5.png)
+
 ## Getting Started
 
 ```bash
@@ -83,3 +89,4 @@ docs/
 - [ ] Water block improvements (fill gaps, appearance underwater)
 - [ ] Save/load world to localStorage
 - [ ] Creative / Adventure modes
+- [ ] Fault lines less straight, make zig zag
