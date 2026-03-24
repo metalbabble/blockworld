@@ -4,7 +4,7 @@ A browser-based first-person voxel sandbox built with [Three.js](https://threejs
 
 THIS GAME IS A WORK IN PROGRESS!!
 
-Try it out: [Click here to play BlockWorld](https://metalbabble.github.io/blockworld/dist/)
+Try it out: [Click here to play BlockWorld](https://metalbabble.github.io/blockworld/)
 
 ![Screenshot 1](/misc/1.png)
 ![Screenshot 2](/misc/2.png)
