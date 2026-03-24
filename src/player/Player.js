@@ -36,6 +36,9 @@ export class Player {
     // Sound manager (injected after construction)
     this._sound = null;
 
+    // Touch controls (injected after construction)
+    this._tc = null;
+
     // State tracking for sound events
     this._wasInWater  = false;
     this._wasOnGround = false;
@@ -59,6 +62,7 @@ export class Player {
   }
 
   setSoundManager(sm) { this._sound = sm; }
+  setTouchControls(tc) { this._tc = tc; }
 
   // ── Controls ──────────────────────────────────────────────────────────────
 
@@ -86,6 +90,12 @@ export class Player {
     // Prevent context menu on right-click
     document.addEventListener('contextmenu', e => e.preventDefault());
   }
+
+  /** Public alias used by TouchControls for the grab action. */
+  grab() { this._leftClick(); }
+
+  /** Public alias used by TouchControls for the put action. */
+  put()  { this._rightClick(); }
 
   _leftClick() {
     // Remove the targeted block → goes to hand
@@ -136,6 +146,8 @@ export class Player {
   _updateHeldHUD() {
     const el = document.getElementById('held-name');
     if (el) el.textContent = this.heldBlock !== null ? BLOCK_NAMES[this.heldBlock] : 'nothing';
+    // Keep touch PUT button in sync
+    this._tc?.syncPutBtn();
   }
 
   // ── Physics ───────────────────────────────────────────────────────────────
@@ -143,15 +155,18 @@ export class Player {
   update(dt) {
     dt = Math.min(dt, 0.05); // cap to avoid tunnelling on lag spikes
 
-    // Gather move input in camera-relative direction
+    // Merge keyboard and touch virtual keys into a single movement direction
+    const tc  = this._tc?.enabled ? this._tc : null;
+    const vk  = tc?.getMovement() ?? {};
+
     const forward = this._lookDirFlat();
     const right   = new THREE.Vector3(-forward.z, 0, forward.x);
 
     const moving = { x: 0, z: 0 };
-    if (this._keys['KeyW'])  { moving.x += forward.x; moving.z += forward.z; }
-    if (this._keys['KeyS'])  { moving.x -= forward.x; moving.z -= forward.z; }
-    if (this._keys['KeyA'])  { moving.x -= right.x;   moving.z -= right.z;   }
-    if (this._keys['KeyD'])  { moving.x += right.x;   moving.z += right.z;   }
+    if (this._keys['KeyW'] || vk.forward) { moving.x += forward.x; moving.z += forward.z; }
+    if (this._keys['KeyS'] || vk.back)    { moving.x -= forward.x; moving.z -= forward.z; }
+    if (this._keys['KeyA'] || vk.left)    { moving.x -= right.x;   moving.z -= right.z;   }
+    if (this._keys['KeyD'] || vk.right)   { moving.x += right.x;   moving.z += right.z;   }
 
     const len = Math.sqrt(moving.x*moving.x + moving.z*moving.z);
     if (len > 0) { moving.x /= len; moving.z /= len; }
@@ -177,7 +192,8 @@ export class Player {
     }
 
     // Jump on land / swim upward in water / fly upward in debug mode
-    if (this._keys['Space']) {
+    const jumpPressed = this._keys['Space'] || (tc?.isJumping() ?? false);
+    if (jumpPressed) {
       if (inWater) {
         this.velocity.y = SWIM_VEL; // swim up while space held
       } else if (this.debugMode) {

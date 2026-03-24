@@ -9,6 +9,7 @@ import { SoundManager } from './audio/SoundManager.js';
 import { MusicPlayer } from './audio/MusicPlayer.js';
 import { config } from './config.js';
 import { CommandSystem } from './CommandSystem.js';
+import { TouchControls } from './TouchControls.js';
 
 function fogNear() { return (config.drawDistance - 1) * CHUNK_SIZE; }
 function fogFar()  { return (config.drawDistance + 1.5) * CHUNK_SIZE; }
@@ -20,16 +21,20 @@ export class Game {
     this._initScene();
     this._initWorld();
     this._initPlayer();
-    this._initPointerLock();
 
     this._clock     = new THREE.Clock();
     this._started   = false;
     this._animFrame = null;
+    this._touchMode = false;   // true once the player taps (vs clicks) to start
 
     this.sound    = new SoundManager();
     this.music    = new MusicPlayer();
     this.player.setSoundManager(this.sound);
+    this.touch    = new TouchControls(this);
+    this.player.setTouchControls(this.touch);
     this.commands = new CommandSystem(this);
+
+    this._initPointerLock();
   }
 
   _initRenderer() {
@@ -93,31 +98,67 @@ export class Game {
 
   _initPointerLock() {
     const overlay = document.getElementById('overlay');
+
+    // ── Desktop: click requests pointer lock ──────────────────────────────
     overlay.addEventListener('click', () => {
-      this.renderer.domElement.requestPointerLock();
+      if (this._touchMode) {
+        // Tap dismissed by touch — resume touch mode
+        this._resumeTouchMode();
+      } else {
+        this.renderer.domElement.requestPointerLock();
+      }
     });
 
+    // ── Touch / tablet: tap starts (or resumes) touch mode ────────────────
+    overlay.addEventListener('touchstart', e => {
+      e.preventDefault();  // prevent synthetic click from also firing
+      if (this._touchMode) {
+        this._resumeTouchMode();
+      } else {
+        this._touchMode = true;
+        overlay.style.display = 'none';
+        this.touch.enable();
+        this._startGame();
+      }
+    }, { passive: false });
+
+    // ── Pointer lock change (desktop) ─────────────────────────────────────
     document.addEventListener('pointerlockchange', () => {
       if (document.pointerLockElement) {
         overlay.style.display = 'none';
-        if (!this._started) {
-          this._started = true;
-          this._clock.start();
-          this.sound.init();
-          this.music.start();
-          this._loop();
-        }
-      } else {
+        this._startGame();
+      } else if (!this._touchMode) {
+        // Only restore overlay for desktop mode; touch has its own menu button
         overlay.style.display = 'flex';
       }
     });
+  }
+
+  /** Begin the game loop — idempotent (only runs once). */
+  _startGame() {
+    if (this._started) return;
+    this._started = true;
+    this._clock.start();
+    this.sound.init();
+    this.music.start();
+    this._loop();
+  }
+
+  /** Re-show controls after the touch menu was dismissed. */
+  _resumeTouchMode() {
+    document.getElementById('overlay').style.display = 'none';
+    this.touch.resumeFromMenu();
   }
 
   _loop() {
     this._animFrame = requestAnimationFrame(() => this._loop());
     const dt = Math.min(this._clock.getDelta(), 0.1);
 
-    if (!this.commands.active) {
+    // In touch mode pause physics when the overlay/menu is showing
+    const overlayVisible = document.getElementById('overlay').style.display !== 'none';
+    const paused = this.commands.active || (this._touchMode && overlayVisible);
+
+    if (!paused) {
       this.dayNight.update(dt);
       this.player.update(dt);
     }

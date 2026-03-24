@@ -23,6 +23,8 @@ Then open [http://localhost:3456](http://localhost:3456) and click to start.
 
 ## Controls
 
+### Keyboard & Mouse (desktop)
+
 | Key / Button | Action |
 |---|---|
 | W / A / S / D | Move |
@@ -33,15 +35,34 @@ Then open [http://localhost:3456](http://localhost:3456) and click to start.
 | `/` | Open command bar |
 | Esc | Cancel command / Release mouse / pause |
 
+### Touch / Tablet
+
+Tap the title screen (instead of clicking) to enter **touch mode**. On-screen controls appear along the bottom of the game view.
+
+| Control | Action |
+|---|---|
+| ▲ ▼ ◀ ▶ (D-pad, bottom-left) | Move forward / back / left / right |
+| JUMP button | Jump (hold to swim upward in water) |
+| GRAB button | Pick up the targeted block |
+| PUT button | Place the held block (disabled when hand is empty) |
+| Drag finger on screen | Look / rotate camera |
+| ☰ Menu (top-left) | Open the pause overlay (like Esc on desktop) |
+
+Touch mode is also activated automatically when a touch event reaches the title screen, so tablets and phones are supported without any extra configuration.
+
 ## Commands
 
-Press `/` during gameplay to open the command bar. See [`docs/COMMANDS.md`](docs/COMMANDS.md) for the full reference.
+Press `/` during gameplay to open the command bar. See [`COMMANDS.md`](COMMANDS.md) for the full reference.
 
 | Command | Description |
 |---|---|
 | `debug` | Toggle debug mode — 4x speed and hold Space to fly |
 | `drawdistance <n>` | Set draw distance to `n` chunks (1–32) |
 | `reset` | Regenerate the world and return to spawn |
+| `touch on` | Enable on-screen touch controls (useful for testing on desktop) |
+| `touch off` | Disable on-screen touch controls and return to keyboard/mouse |
+| `info on` | Show the world-info overlay (XYZ position, chunk, seed) |
+| `info off` | Hide the world-info overlay |
 
 ## Gameplay
 
@@ -73,6 +94,7 @@ src/
 ├── Game.js                 Scene, renderer, main loop
 ├── config.js               Gameplay settings (draw distance, etc.)
 ├── CommandSystem.js        In-game command bar (/ key)
+├── TouchControls.js        On-screen touch gamepad (D-pad, actions, camera drag)
 ├── world/
 │   ├── World.js            Chunk manager, block API, DDA raycast
 │   ├── Chunk.js            Block storage + mesh builder

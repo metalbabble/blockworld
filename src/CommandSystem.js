@@ -101,6 +101,33 @@ export class CommandSystem {
       this.game.resetWorld();
       this._showResponse('World reset.');
 
+    } else if (cmd === 'info') {
+      const sub = parts[1]?.toLowerCase();
+      const infoEl = document.getElementById('info');
+      if (sub === 'on') {
+        infoEl.style.display = 'block';
+        this._showResponse('Info overlay ON');
+      } else if (sub === 'off') {
+        infoEl.style.display = 'none';
+        this._showResponse('Info overlay OFF');
+      } else {
+        this._showResponse('Usage: info on | info off');
+      }
+
+    } else if (cmd === 'touch') {
+      const sub = parts[1]?.toLowerCase();
+      if (sub === 'on') {
+        this.game._touchMode = true;
+        this.game.touch.enable();
+        this._showResponse('Touch controls enabled');
+      } else if (sub === 'off') {
+        this.game._touchMode = false;
+        this.game.touch.disable();
+        this._showResponse('Touch controls disabled');
+      } else {
+        this._showResponse('Usage: touch on | touch off');
+      }
+
     } else {
       this._showResponse('Invalid command');
     }

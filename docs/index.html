@@ -7,7 +7,7 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; }
-    canvas { display: block; }
+    canvas { display: block; touch-action: none; }
 
     #hud {
       position: fixed;
@@ -53,6 +53,7 @@
 
     /* Info overlay */
     #info {
+      display: none;
       position: absolute;
       top: 10px; left: 10px;
       font-size: 12px;
@@ -128,6 +129,12 @@
       flex-direction: column;
       align-items: center;
     }
+    #overlay-instructions-kb,
+    #overlay-instructions-touch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     #overlay p  { font-size: 1rem; opacity: 0.7; margin: 0.2rem 0; }
     #overlay .hint {
       margin-top: 1.5rem;
@@ -138,21 +145,121 @@
       0%, 100% { opacity: 0.4; text-shadow: none; }
       50% { opacity: 1; text-shadow: 0 0 8px #fff, 0 0 18px rgba(255,255,255,0.6); }
     }
+
+    /* ── Touch controls ───────────────────────────────────────────────────── */
+
+    /* Bottom strip that holds D-pad + action buttons */
+    #touch-controls {
+      display: none;
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      padding: 12px 28px 24px;
+      justify-content: space-between;
+      align-items: flex-end;
+      z-index: 15;
+      pointer-events: none;   /* container is transparent; only buttons catch touches */
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* D-pad column */
+    .tc-dpad {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    /* Middle row of the D-pad (left + right) */
+    .tc-dpad-row {
+      display: flex;
+      gap: 48px; /* space between ◀ and ▶ */
+    }
+
+    /* Action buttons column */
+    .tc-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    /* Shared button style */
+    .tc-btn {
+      pointer-events: all;
+      background: rgba(0, 0, 0, 0.55);
+      border: 2px solid rgba(255, 255, 255, 0.38);
+      border-radius: 12px;
+      color: #fff;
+      font-family: monospace;
+      font-weight: bold;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .tc-btn:active,
+    .tc-btn.tc-pressed { background: rgba(255, 255, 255, 0.22); }
+    .tc-btn:disabled   { opacity: 0.32; cursor: default; }
+
+    /* D-pad buttons: large square */
+    .tc-dpad .tc-btn {
+      width: 72px;
+      height: 72px;
+      font-size: 22px;
+    }
+
+    /* Action buttons: wide rectangle */
+    .tc-actions .tc-btn {
+      width: 88px;
+      height: 56px;
+      font-size: 13px;
+      letter-spacing: 1px;
+    }
+
+    /* ☰ Menu button (top-left, touch mode only) */
+    #touch-menu-btn {
+      display: none;
+      position: fixed;
+      top: 12px; left: 12px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 2px solid rgba(255, 255, 255, 0.38);
+      border-radius: 8px;
+      color: #fff;
+      font-family: monospace;
+      font-size: 14px;
+      padding: 8px 16px;
+      cursor: pointer;
+      z-index: 15;
+      pointer-events: all;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
   </style>
-  <script type="module" crossorigin src="/blockworld/assets/index-fBn_9hOd.js"></script>
+  <script type="module" crossorigin src="/blockworld/assets/index-DpHqv2mK.js"></script>
 </head>
 <body>
   <div id="overlay">
     <div id="overlay-title">
-      <!--<h1>BLOCKWORLD</h1>-->
-      <img src="/blockworld/assets/blockworld-title-DH6HQb9J.png" alt="BlockWorld"/>
+      <img src="/blockworld/blockworld-title.png" alt="BlockWorld"/>
       <p id="version-display"></p>
       <p class="site">metalbabble.com</p>
     </div>
     <div id="overlay-instructions">
-      <p>W/A/S/D — Move &nbsp;|&nbsp; Space — Jump &nbsp;|&nbsp; Shift — Sprint</p>
-      <p>Left Click — Pick up block &nbsp;|&nbsp; Right Click — Place block</p>
-      <p class="hint">Click to continue...</p>
+      <!-- Keyboard / mouse instructions (default) -->
+      <div id="overlay-instructions-kb">
+        <p>W/A/S/D — Move &nbsp;|&nbsp; Space — Jump &nbsp;|&nbsp; Shift — Sprint</p>
+        <p>Left Click — Pick up block &nbsp;|&nbsp; Right Click — Place block</p>
+      </div>
+      <!-- Touch instructions (shown after first tap) -->
+      <div id="overlay-instructions-touch" style="display:none">
+        <p>Left pad — Move &nbsp;|&nbsp; JUMP — Jump</p>
+        <p>GRAB — Pick up block &nbsp;|&nbsp; PUT — Place block</p>
+        <p>Drag on screen to look around</p>
+      </div>
+      <p class="hint" id="overlay-hint">Tap or click to continue...</p>
     </div>
   </div>
 
