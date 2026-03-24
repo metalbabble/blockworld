@@ -41,7 +41,7 @@ Press `/` during gameplay to open the command bar. See [`docs/COMMANDS.md`](docs
 
 ## Gameplay
 
-- **One block at a time** — left-clicking a block picks it up into your hand; right-clicking places it. You can only hold one block at a time.
+- **Move and place blocks** — left-clicking a block picks it up into your hand; right-clicking places it. You can only hold one block at a time.... for now
 - **Placement rules** — blocks can only be placed adjacent to an existing block (no floating islands).
 - **Ghost preview** — a white outline shows exactly where your held block will land before you place it.
 
@@ -58,6 +58,7 @@ Gameplay settings live in [`src/config.js`](src/config.js):
 
 | Setting | Default | Description |
 |---|---|---|
+| `version` | `0.0.0` | Shows the current version of the game. |
 | `drawDistance` | `5` | Chunks loaded/rendered in each direction from the player. Higher values show more world at the cost of performance. |
 
 ## Project Structure
