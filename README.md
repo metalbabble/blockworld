@@ -2,6 +2,10 @@
 
 A browser-based first-person voxel sandbox built with [Three.js](https://threejs.org/) and [Vite](https://vitejs.dev/). Dig up blocks and place them back down in an infinitely generating world.
 
+THIS GAME IS A WORK IN PROGRESS!!
+
+Try it out: [Click here to play BlockWorld](https://metalbabble.github.io/blockworld/dist/)
+
 ![Screenshot 1](/misc/1.png)
 ![Screenshot 2](/misc/2.png)
 ![Screenshot 3](/misc/3.png)

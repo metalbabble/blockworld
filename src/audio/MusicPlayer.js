@@ -17,7 +17,7 @@ export class MusicPlayer {
   // Uses Audio element so it works reliably with Vite's static file server.
   async _probe() {
     for (let i = 1; i <= 99; i++) {
-      const url = `/music/${i}.mp3`;
+      const url = `${import.meta.env.BASE_URL}music/${i}.mp3`;
       const ok = await new Promise(resolve => {
         const a = new Audio();
         a.preload = 'metadata';
