@@ -18,6 +18,11 @@
       text-shadow: 1px 1px 2px #000;
     }
 
+    /* Hide crosshair while overlay is visible */
+    #overlay:not([style*="display: none"]):not([style*="display:none"]) ~ #hud #crosshair {
+      display: none;
+    }
+
     /* Crosshair */
     #crosshair {
       position: absolute;
@@ -103,25 +108,50 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 4vh;
       color: #fff;
       font-family: monospace;
       cursor: pointer;
       z-index: 10;
     }
-    #overlay h1 { font-size: 2.5rem; margin-bottom: 1rem; letter-spacing: 2px; }
+    #overlay-title {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #overlay h1 { font-size: 2.5rem; margin-bottom: 0.3rem; letter-spacing: 2px; }
+    #overlay .site { font-size: 0.85rem; opacity: 0.6; margin: 0.15rem 0; }
+    #version-display { font-size: 0.75rem; opacity: 0.35; margin: 0.1rem 0; }
+    #overlay-instructions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     #overlay p  { font-size: 1rem; opacity: 0.7; margin: 0.2rem 0; }
-    #overlay .hint { margin-top: 2rem; font-size: 0.85rem; opacity: 0.5; }
+    #overlay .hint {
+      margin-top: 1.5rem;
+      font-size: 0.85rem;
+      animation: glow-pulse 2s ease-in-out infinite;
+    }
+    @keyframes glow-pulse {
+      0%, 100% { opacity: 0.4; text-shadow: none; }
+      50% { opacity: 1; text-shadow: 0 0 8px #fff, 0 0 18px rgba(255,255,255,0.6); }
+    }
   </style>
-  <script type="module" crossorigin src="/blockworld/assets/index-D4kRl4Ch.js"></script>
+  <script type="module" crossorigin src="/blockworld/assets/index-fBn_9hOd.js"></script>
 </head>
 <body>
   <div id="overlay">
-    <h1>BLOCKWORLD</h1>
-    <p style="margin-top:-0.5rem; margin-bottom:0.5rem; font-size:0.85rem; opacity:0.6;">metalbabble.com</p>
-    <p>W/A/S/D — Move &nbsp;|&nbsp; Space — Jump</p>
-    <p>Left Click — Pick up block &nbsp;|&nbsp; Right Click — Place block</p>
-    <p class="hint">Click to start</p>
-    <p id="version-display" style="margin-top:0.5rem; font-size:0.75rem; opacity:0.35;"></p>
+    <div id="overlay-title">
+      <h1>BLOCKWORLD</h1>
+      <p id="version-display"></p>
+      <p class="site">metalbabble.com</p>
+    </div>
+    <div id="overlay-instructions">
+      <p>W/A/S/D — Move &nbsp;|&nbsp; Space — Jump &nbsp;|&nbsp; Shift — Sprint</p>
+      <p>Left Click — Pick up block &nbsp;|&nbsp; Right Click — Place block</p>
+      <p class="hint">Click to continue...</p>
+    </div>
   </div>
 
   <div id="hud">
