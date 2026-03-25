@@ -1,6 +1,6 @@
 // Gameplay configuration
 export const config = {
-  version: '0.2.4',
+  version: '0.2.5',
 
   // Message of the day shown on the main menu overlay. Set to '' to hide.
   motd: '** Latest update: added inventory system! **',

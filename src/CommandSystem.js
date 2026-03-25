@@ -72,6 +72,9 @@ export class CommandSystem {
   _showResponse(msg) {
     this._response.textContent = msg;
     this._response.style.display = 'block';
+    const dock = document.getElementById('inventory-dock');
+    const dockVisible = dock && dock.style.display !== 'none';
+    this._response.style.bottom = dockVisible ? '110px' : '48px';
     if (this._responseTimer) clearTimeout(this._responseTimer);
     this._responseTimer = setTimeout(() => {
       this._response.style.display = 'none';
