@@ -7,6 +7,21 @@ const SEA_LEVEL       = 18;  // water fills valleys up to this height
 const SNOW_HEIGHT     = 42;  // surface blocks at or above this get snow
 const TREE_GRID       = 6;   // one potential tree per N×N world-block cell
 
+// ── Caves ─────────────────────────────────────────────────────────────────────
+const CAVE_SCALE          = 0.045; // noise horizontal frequency (lower = larger tunnels)
+const CAVE_THRESHOLD      = 0.026; // n1²+n2² < this → carve (lower = rarer/narrower)
+const CAVE_SURFACE_BUFFER = 6;     // min blocks below (surface − dirt) before caves start
+
+// Returns a density value in [0, ~2]; blocks are carved where value < CAVE_THRESHOLD.
+// Two pseudo-3D noise samples (y offsets make the cave worm through all three axes).
+// Multiplying two independent fields keeps caves tube-shaped rather than planar.
+function caveNoise(wx, wy, wz) {
+  const s = CAVE_SCALE;
+  const n1 = perlin2(wx * s + wy * 0.11,          wz * s + wy * 0.07        );
+  const n2 = perlin2(wx * s + wy * 0.07 + 97.3,   wz * s + wy * 0.13 + 43.1);
+  return n1 * n1 + n2 * n2;
+}
+
 // ── Fault lines ──────────────────────────────────────────────────────────────
 const FAULT_GRID        = 320;  // world-blocks per fault-grid cell
 const FAULT_CHANCE      = 0.22; // probability a cell contains a fault
@@ -203,6 +218,22 @@ export class World {
         }
       }
     }
+
+    // Cave carving — hollow out stone in the subsurface layer.
+    // Done as a second pass so surface/dirt/gem placement is already settled.
+    for (let lx = 0; lx < CHUNK_SIZE; lx++) {
+      for (let lz = 0; lz < CHUNK_SIZE; lz++) {
+        const surface = terrainHeight(wx0 + lx, wz0 + lz);
+        const maxCaveY = surface - DIRT_DEPTH - CAVE_SURFACE_BUFFER;
+        for (let y = 2; y <= maxCaveY; y++) {
+          if (chunk.getBlock(lx, y, lz) !== BLOCKS.STONE) continue;
+          if (caveNoise(wx0 + lx, y, wz0 + lz) < CAVE_THRESHOLD) {
+            chunk.setBlock(lx, y, lz, BLOCKS.AIR);
+          }
+        }
+      }
+    }
+
     chunk.dirty = true;
     return chunk;
   }
