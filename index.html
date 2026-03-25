@@ -253,6 +253,13 @@
       letter-spacing: 1px;
     }
 
+    /* Narrow portrait viewports: raise touch controls above the inventory dock */
+    @media (max-width: 500px) {
+      #touch-controls {
+        bottom: 96px; /* clears the dock (56px icon + 16px padding + 20px offset + margin) */
+      }
+    }
+
     /* ☰ Menu button (top-left, touch mode only) */
     #touch-menu-btn {
       display: none;

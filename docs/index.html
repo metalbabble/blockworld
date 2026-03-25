@@ -253,6 +253,13 @@
       letter-spacing: 1px;
     }
 
+    /* Narrow portrait viewports: raise touch controls above the inventory dock */
+    @media (max-width: 500px) {
+      #touch-controls {
+        bottom: 96px; /* clears the dock (56px icon + 16px padding + 20px offset + margin) */
+      }
+    }
+
     /* ☰ Menu button (top-left, touch mode only) */
     #touch-menu-btn {
       display: none;
@@ -274,7 +281,7 @@
       -webkit-user-select: none;
     }
   </style>
-  <script type="module" crossorigin src="/blockworld/assets/index-CEVFhIJ7.js"></script>
+  <script type="module" crossorigin src="/blockworld/assets/index-BPpX46gJ.js"></script>
 </head>
 <body>
   <div id="overlay">
