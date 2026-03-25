@@ -1,18 +1,19 @@
 import * as THREE from 'three';
 
-// Atlas layout (horizontal strip, 8 tiles × 64px = 512×64, power-of-two)
-// Tile 0: grass top   u=[0.000, 0.125]
-// Tile 1: grass side  u=[0.125, 0.250]
-// Tile 2: dirt        u=[0.250, 0.375]
-// Tile 3: stone       u=[0.375, 0.500]
-// Tile 4: snow        u=[0.500, 0.625]
-// Tile 5: bedrock     u=[0.625, 0.750]
-// Tile 6: wood        u=[0.750, 0.875]
-// Tile 7: leaves      u=[0.875, 1.000]
+// Atlas layout (horizontal strip, 16 tiles × 64px = 1024×64, power-of-two)
+// Tile 0: grass top   u=[0.000, 0.0625]
+// Tile 1: grass side  u=[0.0625, 0.125]
+// Tile 2: dirt        u=[0.125, 0.1875]
+// Tile 3: stone       u=[0.1875, 0.250]
+// Tile 4: snow        u=[0.250, 0.3125]
+// Tile 5: bedrock     u=[0.3125, 0.375]
+// Tile 6: wood        u=[0.375, 0.4375]
+// Tile 7: leaves      u=[0.4375, 0.500]
+// Tile 8: gem         u=[0.500, 0.5625]
 
 const TILE_SIZE = 64;
-const TILE_COUNT = 8;           // padded to next POT: 8×64 = 512px wide
-const ATLAS_W = TILE_SIZE * TILE_COUNT;  // 512 — power of two
+const TILE_COUNT = 16;           // padded to next POT: 16×64 = 1024px wide
+const ATLAS_W = TILE_SIZE * TILE_COUNT;  // 1024 — power of two
 const ATLAS_H = TILE_SIZE;
 
 function noise(x, y, scale = 8) {
@@ -232,6 +233,47 @@ function drawLeaves(ctx, ox) {
   }
 }
 
+function drawGem(ctx, ox) {
+  // Deep dark base
+  ctx.fillStyle = '#06040f';
+  ctx.fillRect(ox, 0, TILE_SIZE, TILE_SIZE);
+  // Iridescent crystal facets in shifting hues
+  const hues = [260, 180, 300, 140, 200, 320, 160, 240];
+  for (let i = 0; i < 22; i++) {
+    const px = Math.floor(noise(i * 0.11 + 0.07, i * 0.17 + 0.31, 8) * TILE_SIZE);
+    const py = Math.floor(noise(i * 0.19 + 0.53, i * 0.13 + 0.67, 8) * TILE_SIZE);
+    const sz = 5 + Math.floor(noise(i * 0.23 + 0.41, i * 0.09 + 0.83, 6) * 9);
+    const hue = hues[i % hues.length];
+    const light = 30 + Math.floor(noise(i * 0.29 + 0.17, i * 0.07 + 0.43, 7) * 35);
+    ctx.fillStyle = `hsl(${hue}, 95%, ${light}%)`;
+    ctx.beginPath();
+    ctx.moveTo(ox + px, py);
+    ctx.lineTo(ox + px + sz, py + sz * 0.5);
+    ctx.lineTo(ox + px + sz * 0.6, py + sz);
+    ctx.lineTo(ox + px - sz * 0.3, py + sz * 0.7);
+    ctx.closePath();
+    ctx.fill();
+  }
+  // Bright inner glow tint
+  const grad = ctx.createRadialGradient(ox + 32, 32, 4, ox + 32, 32, 32);
+  grad.addColorStop(0, 'rgba(180,140,255,0.25)');
+  grad.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(ox, 0, TILE_SIZE, TILE_SIZE);
+  // Sparkle highlights
+  for (let i = 0; i < 14; i++) {
+    const px = Math.floor(noise(i * 0.13 + 0.61, i * 0.21 + 0.23, 8) * TILE_SIZE);
+    const py = Math.floor(noise(i * 0.17 + 0.37, i * 0.09 + 0.71, 8) * TILE_SIZE);
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.fillRect(ox + px, py, 2, 2);
+    ctx.fillStyle = 'rgba(200,180,255,0.5)';
+    ctx.fillRect(ox + px - 1, py, 1, 1);
+    ctx.fillRect(ox + px + 2, py, 1, 1);
+    ctx.fillRect(ox + px, py - 1, 1, 1);
+    ctx.fillRect(ox + px, py + 2, 1, 1);
+  }
+}
+
 export function createTextureAtlas() {
   const canvas = document.createElement('canvas');
   canvas.width  = ATLAS_W;
@@ -246,6 +288,7 @@ export function createTextureAtlas() {
   drawBedrock(ctx,    5 * TILE_SIZE);
   drawWood(ctx,       6 * TILE_SIZE);
   drawLeaves(ctx,     7 * TILE_SIZE);
+  drawGem(ctx,        8 * TILE_SIZE);
 
   const tex = new THREE.CanvasTexture(canvas);
   tex.magFilter = THREE.NearestFilter;

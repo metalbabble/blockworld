@@ -179,6 +179,22 @@ export class World {
           chunk.setBlock(lx, y, lz, id);
         }
 
+        // Gem veins: sparse iridescent clusters deep underground
+        if (hashFloat(wx0 + lx + 9437, wz0 + lz + 2851) < 0.015) {
+          const clusterY   = 3 + Math.floor(hashFloat(wx0 + lx + 5678, wz0 + lz + 8765) * 10);
+          const clusterSize = 2 + Math.floor(hashFloat(wx0 + lx + 2222, wz0 + lz + 3333) * 4);
+          for (let i = 0; i < clusterSize; i++) {
+            const gx = lx + Math.floor(hashFloat(wx0 + lx + i * 17, wz0 + lz + i * 31) * 5) - 2;
+            const gy = clusterY + Math.floor(hashFloat(wx0 + lx + i * 23, wz0 + lz + i * 13) * 3) - 1;
+            const gz = lz + Math.floor(hashFloat(wx0 + lx + i * 37, wz0 + lz + i * 19) * 5) - 2;
+            if (gx < 0 || gx >= CHUNK_SIZE || gz < 0 || gz >= CHUNK_SIZE) continue;
+            if (gy < 1 || gy > 12) continue;
+            if (chunk.getBlock(gx, gy, gz) === BLOCKS.STONE) {
+              chunk.setBlock(gx, gy, gz, BLOCKS.GEM);
+            }
+          }
+        }
+
         // Fill valleys below sea level with water
         if (surface < SEA_LEVEL) {
           for (let y = surface + 1; y <= SEA_LEVEL; y++) {

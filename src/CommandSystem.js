@@ -1,5 +1,5 @@
 import { config } from './config.js';
-import { CHUNK_SIZE } from './world/Chunk.js';
+import { CHUNK_SIZE, BLOCKS, BLOCK_NAMES } from './world/Chunk.js';
 
 export class CommandSystem {
   constructor(game) {
@@ -126,6 +126,20 @@ export class CommandSystem {
         this._showResponse('Touch controls disabled');
       } else {
         this._showResponse('Usage: touch on | touch off');
+      }
+
+    } else if (cmd === 'block') {
+      const name = parts[1]?.toLowerCase();
+      const entry = Object.entries(BLOCK_NAMES).find(([, n]) => n === name);
+      if (!name || !entry) {
+        const valid = Object.values(BLOCK_NAMES).filter(n => n !== 'air').join(', ');
+        this._showResponse(`Usage: block <name>  Valid: ${valid}`);
+      } else if (name === 'air') {
+        this._showResponse('Cannot give air');
+      } else {
+        this.game.player.heldBlock = Number(entry[0]);
+        this.game.player._updateHeldHUD();
+        this._showResponse(`Gave ${name}`);
       }
 
     } else {

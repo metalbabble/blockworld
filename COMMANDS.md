@@ -11,3 +11,4 @@ Press `/` during gameplay to open the command bar.
 | `reset` | Regenerate the world and return to spawn |
 | `touch on` | Enable on-screen touch controls (useful for testing on desktop) |
 | `touch off` | Disable on-screen touch controls and return to keyboard/mouse |
+| `block <name>` | Place a block of the given type into your hand (e.g. `block gem`, `block stone`) |

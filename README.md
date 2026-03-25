@@ -63,6 +63,7 @@ Press `/` during gameplay to open the command bar. See [`COMMANDS.md`](COMMANDS.
 | `touch off` | Disable on-screen touch controls and return to keyboard/mouse |
 | `info on` | Show the world-info overlay (XYZ position, chunk, seed) |
 | `info off` | Hide the world-info overlay |
+| `block <name>` | Place a block of the given type into your hand (e.g. `block gem`, `block stone`) |
 
 ## Gameplay
 
@@ -75,6 +76,7 @@ Press `/` during gameplay to open the command bar. See [`COMMANDS.md`](COMMANDS.
 - Infinite chunk-based world (16 × 16 × 64 per chunk)
 - Terrain shaped by 6-octave FBM Perlin noise — rolling hills and valleys, ~16–40 blocks above sea level
 - **Grass** on the surface, **dirt** for the top few layers, **stone** below
+- **Gems** — rare iridescent crystal blocks that spawn in small clusters deep underground (Y ≤ 12). Dig down through stone to find them.
 - Chunks load as you explore and unload when you move away; distance fog hides the boundary
 
 ## Configuration

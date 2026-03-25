@@ -4,9 +4,9 @@ import { tileUV } from '../rendering/TextureAtlas.js';
 export const CHUNK_SIZE   = 16;
 export const CHUNK_HEIGHT = 64;
 
-export const BLOCKS = { AIR: 0, GRASS: 1, DIRT: 2, STONE: 3, SNOW: 4, WATER: 5, BEDROCK: 6, WOOD: 7, LEAVES: 8 };
+export const BLOCKS = { AIR: 0, GRASS: 1, DIRT: 2, STONE: 3, SNOW: 4, WATER: 5, BEDROCK: 6, WOOD: 7, LEAVES: 8, GEM: 9 };
 
-export const BLOCK_NAMES = { 0: 'air', 1: 'grass', 2: 'dirt', 3: 'stone', 4: 'snow', 5: 'water', 6: 'bedrock', 7: 'wood', 8: 'leaves' };
+export const BLOCK_NAMES = { 0: 'air', 1: 'grass', 2: 'dirt', 3: 'stone', 4: 'snow', 5: 'water', 6: 'bedrock', 7: 'wood', 8: 'leaves', 9: 'gem' };
 
 // Atlas tile indices per block face
 // face order: left(-X), right(+X), bottom(-Y), top(+Y), back(-Z), front(+Z)
@@ -22,6 +22,7 @@ function getTile(blockId, faceIndex) {
     case BLOCKS.BEDROCK: return 5;
     case BLOCKS.WOOD:    return 6;
     case BLOCKS.LEAVES:  return 7;
+    case BLOCKS.GEM:     return 8;
     default: return 2;
   }
 }
