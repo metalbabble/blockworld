@@ -1,5 +1,6 @@
 import * as THREE from 'three';
-import { BLOCKS, BLOCK_NAMES, CHUNK_HEIGHT } from '../world/Chunk.js';
+import { BLOCKS, CHUNK_HEIGHT } from '../world/Chunk.js';
+import { InventoryDock } from '../ui/InventoryDock.js';
 
 const GRAVITY       = 28;   // m/s²
 const JUMP_VEL      = 9.5;  // m/s
@@ -12,6 +13,8 @@ const SWIM_VEL      = 4.5;  // m/s — upward burst when pressing jump in water
 const EYE_HEIGHT  = 1.6;   // metres above feet
 const HALF_W      = 0.29;  // half-width of player AABB
 const PLAYER_H    = 1.8;
+
+const MAX_STACK = 99;
 
 export class Player {
   constructor(camera, world) {
@@ -27,8 +30,9 @@ export class Player {
     this.yaw   = 0;   // radians, horizontal
     this.pitch = 0;   // radians, vertical (clamped)
 
-    // Block in hand
-    this.heldBlock = null;  // null = empty hand
+    // Inventory: Map<blockId, count>
+    this.inventory     = new Map();
+    this.selectedBlock = null;  // currently selected block ID, or null
 
     // Debug mode (toggled via command)
     this.debugMode = false;
@@ -46,6 +50,9 @@ export class Player {
     // Input state
     this._keys = {};
     this._initControls();
+
+    // Inventory dock UI
+    this._dock = new InventoryDock(this);
 
     // Ghost block preview (place indicator)
     const ghostGeo  = new THREE.BoxGeometry(1.001, 1.001, 1.001);
@@ -70,6 +77,8 @@ export class Player {
     document.addEventListener('keydown', e => {
       this._keys[e.code] = true;
       if (e.code === 'Space' || e.code === 'ShiftLeft') e.preventDefault();
+      if (e.code === 'ArrowLeft')  { e.preventDefault(); this._cycleSelection(-1); }
+      if (e.code === 'ArrowRight') { e.preventDefault(); this._cycleSelection(1);  }
     });
     document.addEventListener('keyup', e => { this._keys[e.code] = false; });
 
@@ -98,7 +107,7 @@ export class Player {
   put()  { this._rightClick(); }
 
   _leftClick() {
-    // Remove the targeted block → goes to hand
+    // Remove the targeted block → add to inventory
     const hit = this.world.raycast(
       this._eyePos(),
       this._lookDir()
@@ -108,14 +117,13 @@ export class Player {
     if (blockId === BLOCKS.BEDROCK) return;
     this.world.setBlock(pos.x, pos.y, pos.z, BLOCKS.AIR);
     this.world.propagateWater(pos.x, pos.y, pos.z);
-    this.heldBlock = blockId;
-    this._updateHeldHUD();
+    this._pickBlock(blockId);
     this._sound?.playRemoveBlock();
   }
 
   _rightClick() {
-    // Place held block
-    if (this.heldBlock === null) return;
+    // Place selected block
+    if (this.selectedBlock === null) return;
     const hit = this.world.raycast(this._eyePos(), this._lookDir());
     if (!hit) return;
 
@@ -125,10 +133,8 @@ export class Player {
     // Can't place inside the player
     if (this._overlapsPlayer(x, y, z)) return;
 
-    // Must be adjacent to existing block (guaranteed by face placement, but confirm non-air below)
-    this.world.setBlock(x, y, z, this.heldBlock);
-    this.heldBlock = null;
-    this._updateHeldHUD();
+    this.world.setBlock(x, y, z, this.selectedBlock);
+    this._consumeSelected();
     this._sound?.playPlaceBlock();
   }
 
@@ -143,9 +149,58 @@ export class Player {
     );
   }
 
+  // ── Inventory management ──────────────────────────────────────────────────
+
+  /** Add one of blockId to the inventory, capped at MAX_STACK. */
+  _pickBlock(id) {
+    const cur = this.inventory.get(id) ?? 0;
+    this.inventory.set(id, Math.min(MAX_STACK, cur + 1));
+    if (this.selectedBlock === null) this.selectedBlock = id;
+    this._updateHeldHUD();
+  }
+
+  /** Consume one of the currently selected block; update selection if depleted. */
+  _consumeSelected() {
+    const id    = this.selectedBlock;
+    const count = this.inventory.get(id) ?? 0;
+    if (count <= 1) {
+      this.inventory.delete(id);
+      this.selectedBlock = this.inventory.size > 0
+        ? this.inventory.keys().next().value
+        : null;
+    } else {
+      this.inventory.set(id, count - 1);
+    }
+    this._updateHeldHUD();
+  }
+
+  /** Select a specific block from inventory (used by dock touch and command). */
+  _selectBlock(id) {
+    if (this.inventory.has(id)) {
+      this.selectedBlock = id;
+      this._updateHeldHUD();
+    }
+  }
+
+  /** Cycle selection left (-1) or right (+1) through inventory items. */
+  _cycleSelection(dir) {
+    if (this.inventory.size === 0) return;
+    const ids = [...this.inventory.keys()];
+    if (this.selectedBlock === null) {
+      this.selectedBlock = ids[0];
+    } else {
+      const idx  = ids.indexOf(this.selectedBlock);
+      const next = (idx + dir + ids.length) % ids.length;
+      this.selectedBlock = ids[next];
+    }
+    this._updateHeldHUD();
+  }
+
+  /** Give the player one of blockId (used by command system). */
+  giveBlock(id) { this._pickBlock(id); }
+
   _updateHeldHUD() {
-    const el = document.getElementById('held-name');
-    if (el) el.textContent = this.heldBlock !== null ? BLOCK_NAMES[this.heldBlock] : 'nothing';
+    this._dock.update(this.inventory, this.selectedBlock);
     // Keep touch PUT button in sync
     this._tc?.syncPutBtn();
   }
@@ -286,7 +341,7 @@ export class Player {
   // ── Ghost block preview ───────────────────────────────────────────────────
 
   _updateGhost() {
-    if (this.heldBlock === null) {
+    if (this.selectedBlock === null) {
       this.ghostMesh.visible  = false;
       this.ghostEdges.visible = false;
       return;

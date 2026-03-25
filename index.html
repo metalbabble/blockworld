@@ -43,18 +43,47 @@
     #crosshair::before { width: 2px; height: 100%; left: 50%; transform: translateX(-50%); }
     #crosshair::after  { width: 100%; height: 2px; top: 50%;  transform: translateY(-50%); }
 
-    /* Block-in-hand display */
-    #held-block {
-      position: absolute;
-      bottom: 24px; right: 24px;
-      background: rgba(0,0,0,0.55);
-      border: 2px solid rgba(255,255,255,0.3);
-      border-radius: 6px;
-      padding: 8px 14px;
-      font-size: 13px;
-      letter-spacing: 0.5px;
+    /* Inventory dock */
+    #inventory-dock {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      gap: 8px;
+      padding: 8px 12px;
+      background: rgba(0,0,0,0.5);
+      border-radius: 16px;
+      pointer-events: all;
+      z-index: 12;
+      user-select: none;
+      -webkit-user-select: none;
     }
-    #held-block span { color: #aef; }
+    .dock-item {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.25);
+      overflow: hidden;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .dock-item.dock-selected {
+      border-color: #fff;
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.55);
+    }
+    .dock-badge {
+      position: absolute;
+      bottom: 3px;
+      right: 5px;
+      font-family: monospace;
+      font-size: 11px;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 1px 1px 2px #000, -1px 0 2px #000;
+      pointer-events: none;
+    }
 
     /* Info overlay */
     #info {
@@ -269,7 +298,6 @@
 
   <div id="hud">
     <div id="crosshair"></div>
-    <div id="held-block">Holding: <span id="held-name">nothing</span></div>
     <div id="info">
       <div id="world-seed"></div>
       <div id="pos-display"></div>

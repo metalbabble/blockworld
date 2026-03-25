@@ -274,7 +274,7 @@ function drawGem(ctx, ox) {
   }
 }
 
-export function createTextureAtlas() {
+export function createAtlasCanvas() {
   const canvas = document.createElement('canvas');
   canvas.width  = ATLAS_W;
   canvas.height = ATLAS_H;
@@ -290,6 +290,11 @@ export function createTextureAtlas() {
   drawLeaves(ctx,     7 * TILE_SIZE);
   drawGem(ctx,        8 * TILE_SIZE);
 
+  return canvas;
+}
+
+export function createTextureAtlas() {
+  const canvas = createAtlasCanvas();
   const tex = new THREE.CanvasTexture(canvas);
   tex.magFilter = THREE.NearestFilter;
   tex.minFilter = THREE.NearestMipmapLinearFilter;

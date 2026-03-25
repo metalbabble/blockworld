@@ -137,8 +137,7 @@ export class CommandSystem {
       } else if (name === 'air') {
         this._showResponse('Cannot give air');
       } else {
-        this.game.player.heldBlock = Number(entry[0]);
-        this.game.player._updateHeldHUD();
+        this.game.player.giveBlock(Number(entry[0]));
         this._showResponse(`Gave ${name}`);
       }
 

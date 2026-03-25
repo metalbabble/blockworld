@@ -1,6 +1,6 @@
 // Gameplay configuration
 export const config = {
-  version: '0.2.2',
+  version: '0.2.3',
 
   // Number of chunks rendered in each direction from the player.
   // Higher values show more of the world but cost more CPU/GPU. (Default: 5)

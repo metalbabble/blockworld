@@ -240,6 +240,6 @@ export class TouchControls {
 
   _syncPutBtn() {
     const btn = document.getElementById('tc-put');
-    if (btn) btn.disabled = this.game.player.heldBlock === null;
+    if (btn) btn.disabled = this.game.player.selectedBlock === null;
   }
 }
