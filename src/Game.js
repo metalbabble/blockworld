@@ -79,6 +79,12 @@ export class Game {
     this.world = new World(this.scene, this.material);
     document.getElementById('world-seed').textContent = `World #${WORLD_SEED}`;
     document.getElementById('version-display').textContent = `v${config.version}`;
+    const motdEl = document.getElementById('overlay-motd');
+    if (config.motd) {
+      motdEl.textContent = config.motd;
+    } else {
+      motdEl.style.display = 'none';
+    }
   }
 
   _initPlayer() {

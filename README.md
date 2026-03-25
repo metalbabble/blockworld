@@ -30,8 +30,9 @@ Then open [http://localhost:3456](http://localhost:3456) and click to start.
 | W / A / S / D | Move |
 | Space | Jump |
 | Mouse | Look around (FPS / Pointer Lock) |
-| Left Click | Pick up targeted block |
-| Right Click | Place held block |
+| Left Click | Pick up targeted block (adds to inventory) |
+| Right Click | Place selected block |
+| Left / Right Arrow | Cycle inventory dock selection |
 | `/` | Open command bar |
 | Esc | Cancel command / Release mouse / pause |
 
@@ -43,8 +44,9 @@ Tap the title screen (instead of clicking) to enter **touch mode**. On-screen co
 |---|---|
 | ▲ ▼ ◀ ▶ (D-pad, bottom-left) | Move forward / back / left / right |
 | JUMP button | Jump (hold to swim upward in water) |
-| GRAB button | Pick up the targeted block |
-| PUT button | Place the held block (disabled when hand is empty) |
+| GRAB button | Pick up the targeted block (adds to inventory) |
+| PUT button | Place the selected block (disabled when inventory is empty) |
+| Tap inventory icon | Select that block type |
 | Drag finger on screen | Look / rotate camera |
 | ☰ Menu (top-left) | Open the pause overlay (like Esc on desktop) |
 
@@ -67,9 +69,11 @@ Press `/` during gameplay to open the command bar. See [`COMMANDS.md`](COMMANDS.
 
 ## Gameplay
 
-- **Move and place blocks** — left-clicking a block picks it up into your hand; right-clicking places it. You can only hold one block at a time.... for now
+- **Inventory** — picking up a block adds it to your inventory (up to 99 per type). An icon dock appears centered at the bottom of the screen showing each block type you're carrying with its quantity. The dock is hidden when your inventory is empty.
+- **Selecting blocks** — use **Left / Right Arrow** (keyboard) or tap an icon (touch) to choose which block type to place. The selected slot is outlined in white.
+- **Placing blocks** — right-click (or PUT on touch) places one of the selected block type. When a stack runs out, the next available type is selected automatically.
 - **Placement rules** — blocks can only be placed adjacent to an existing block (no floating islands).
-- **Ghost preview** — a white outline shows exactly where your held block will land before you place it.
+- **Ghost preview** — a white outline shows exactly where your selected block will land before you place it.
 
 ## World Generation
 
@@ -102,7 +106,9 @@ src/
 │   ├── Chunk.js            Block storage + mesh builder
 │   └── noise.js            Seeded 2D Perlin noise + FBM
 ├── player/
-│   └── Player.js           FPS controls, AABB physics, block interaction
+│   └── Player.js           FPS controls, AABB physics, block interaction, inventory
+├── ui/
+│   └── InventoryDock.js    Inventory dock HUD (block icons + quantity badges)
 └── rendering/
     └── TextureAtlas.js     Procedural canvas texture atlas (no image files)
 docs/
@@ -111,9 +117,9 @@ docs/
 
 ## Roadmap / Ideas
 
-- [ ] Block inventory (hotbar with multiple block types)
+- [x] Block inventory (dock with per-type counts, keyboard + touch selection)
 - [ ] Underground caves
-- [ ] Trees
+- [x] Trees
 - [ ] Lava
 - [ ] Water block improvements (fill gaps, appearance underwater)
 - [ ] Save/load world to localStorage
